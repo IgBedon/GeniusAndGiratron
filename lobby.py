@@ -1,5 +1,6 @@
 from genius import Genius
 from giratron import Giratron
+import ranking
 import inquirer
 
 
@@ -13,6 +14,7 @@ def introduction():
     
 # Code block to catch menu choice
 def catch_choice():
+    
     questions = [
         inquirer.List('size',
         message="Do you want to...",
@@ -33,20 +35,25 @@ def catch_choice():
         
 
 # Do something using menu choice
-def menu_choice(choice):
+def menu_choice(choice, ranking_df):
     match(choice):
         case 1:
             Genius.show_rules()
             Genius.show_items()
             genius = Genius()
-            genius.start()
+            genius.get_name()
+            genius.start(ranking_df)
+
         case 2:
             Giratron.show_rules()
             Giratron.show_items()
             giratron = Giratron()
-            giratron.start()
+            giratron.get_name()
+            giratron.start(ranking_df)
+
         case 3:
             pass
+
         case 4:
             print("Well, if you want... Finishing...")
             exit()
@@ -54,9 +61,11 @@ def menu_choice(choice):
 
 def start():
     introduction()
+    ranking_df = ranking.load_ranking()
+
     # Game process
     while(True):
-        menu_choice(catch_choice())
+        menu_choice(catch_choice(), ranking_df)
 
 
 start()

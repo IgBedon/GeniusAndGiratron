@@ -33,47 +33,50 @@ class Giratron(Game):
         for _ in range(4):
             self.append_item(self.draw_item())
         
-        print("Starting in")
+        choice = self.get_choice()
+        if(choice):
 
-        while(not lose):
-            round = 0
+            print("Starting in")
+
+            while(not lose):
+                round = 0
+                for sec in range(3):
+                    print(f"{sec+1}...")
+                    sleep(1)
+                print()
+
+                engine.say(self.drawn_items)
+                engine.runAndWait()
+
+
+                while(True):
+                    selected_option = self.ask_option()
+
+                    if(self.drawn_items[round] != selected_option):
+                        lose = True
+                        break
+                    else:
+                        round += 1
+                
+                    if(len(self.drawn_items) == round):
+                        break
+
+                if(not lose):
+                    os.system('cls')
+                    print("====================================================\n")
+                    print("Yeah! You're right!")
+                    self.append_item(self.draw_item())
+                    stage += 1
+            
+            os.system('cls')
+            print("====================================================\n")
+            print("You are wrong! The correct order was: ", self.drawn_items)
+            print(f"You lost on {stage}° stage!")
+            print("Finishing")
             for sec in range(3):
                 print(f"{sec+1}...")
                 sleep(1)
             print()
-
-            engine.say(self.drawn_items)
-            engine.runAndWait()
-
-
-            while(True):
-                selected_option = self.ask_option()
-
-                if(self.drawn_items[round] != selected_option):
-                    lose = True
-                    break
-                else:
-                    round += 1
-            
-                if(len(self.drawn_items) == round):
-                    break
-
-            if(not lose):
-                os.system('cls')
-                print("====================================================\n")
-                print("Yeah! You're right!")
-                self.append_item(self.draw_item())
-                stage += 1
-        
-        os.system('cls')
-        print("====================================================\n")
-        print("You are wrong! The correct order was: ", self.drawn_items)
-        print(f"You lost on {stage}° stage!")
-        print("Finishing")
-        for sec in range(3):
-            print(f"{sec+1}...")
-            sleep(1)
-        print()
 
 
     def draw_item(self):
