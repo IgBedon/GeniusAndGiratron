@@ -1,0 +1,3 @@
+import lobby
+
+lobby.start()

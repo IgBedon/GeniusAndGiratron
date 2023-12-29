@@ -1,4 +1,5 @@
 from game import Game
+import ranking
 from time import sleep
 import os
 import random
@@ -20,19 +21,22 @@ class Giratron(Game):
     
     @classmethod
     def show_items(cls):
-        print("The items are:", cls.items)
+        print("The items are:", cls.items, "\n")
 
 
-    def start(self):
+    def start(self, player):
+        # Defining variables and configuring engine settings
         engine = pyttsx3.init()
-        engine.setProperty("rate", 150)
         engine.setProperty("voice", "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0")
+        voice_rate = 0
         lose = False
         stage = 1
 
+        # Drawing the first four items
         for _ in range(4):
             self.append_item(self.draw_item())
         
+        # Checking if player is ready
         choice = self.get_choice()
         if(choice):
 
@@ -45,10 +49,12 @@ class Giratron(Game):
                     sleep(1)
                 print()
 
+                # Increasing speed and drawing/saying one more item
+                engine.setProperty("rate", 150 + voice_rate)
                 engine.say(self.drawn_items)
                 engine.runAndWait()
 
-
+                # Checking the answer
                 while(True):
                     selected_option = self.ask_option()
 
@@ -61,13 +67,16 @@ class Giratron(Game):
                     if(len(self.drawn_items) == round):
                         break
 
+                # Going to the next level
                 if(not lose):
                     os.system('cls')
                     print("====================================================\n")
                     print("Yeah! You're right!")
                     self.append_item(self.draw_item())
+                    voice_rate += 10
                     stage += 1
             
+            # Case the player loses
             os.system('cls')
             print("====================================================\n")
             print("You are wrong! The correct order was: ", self.drawn_items)
@@ -78,13 +87,20 @@ class Giratron(Game):
                 sleep(1)
             print()
 
+            player.set_stage(stage)
+
+            # Ranking Part (Load, change and update)
+            ranking_df = ranking.load_ranking("Sheet2")
+            new_ranking_df = ranking.set_ranking(ranking_df, player)
+            ranking.update_ranking(new_ranking_df, "Sheet2", "Sheet1")
+
+        else:
+            print("Ok, we can try again later!\n\n")
+
+    # Some support methods
 
     def draw_item(self):
         return random.choice(Giratron.items)
-    
-
-    def append_item(self, drawn_item):
-        self.drawn_items.append(drawn_item)
 
 
     def ask_option(self):

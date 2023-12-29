@@ -29,6 +29,8 @@ class Game(ABC):
     def ask_option(self):
         pass
 
+    
+    # Commom methods for both games
 
     def append_item(self, drawn_item):
         self.drawn_items.append(drawn_item)

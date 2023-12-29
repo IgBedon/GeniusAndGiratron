@@ -1,5 +1,4 @@
 from game import Game
-from player import Player
 import ranking
 from time import sleep
 import os
@@ -13,7 +12,6 @@ class Genius(Game):
 
     def __init__(self):
         super().__init__()
-        self.player = Player(self.get_name(), self.get_edv())
 
 
     @staticmethod
@@ -26,16 +24,19 @@ class Genius(Game):
         print("The items are:", cls.items, "\n")
 
 
-    def start(self, ranking_df):
+    def start(self, player):
+        # Defining variables and configuring engine settings
         engine = pyttsx3.init()
         engine.setProperty("voice", "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0")
         voice_rate = 0
         lose = False
         stage = 1
 
+        # Drawing the first four items
         for _ in range(4):
             self.append_item(self.draw_item())
         
+        # Checking if player is ready
         choice = self.get_choice()
         if(choice):
 
@@ -48,11 +49,12 @@ class Genius(Game):
                     sleep(1)
                 print()
 
+                # Increasing speed and drawing/saying one more item
                 engine.setProperty("rate", 150 + voice_rate)
                 engine.say(self.drawn_items)
                 engine.runAndWait()
 
-
+                # Checking the answer
                 while(True):
                     selected_option = self.ask_option()
 
@@ -65,6 +67,7 @@ class Genius(Game):
                     if(len(self.drawn_items) == round):
                         break
 
+                # Going to the next level
                 if(not lose):
                     os.system('cls')
                     print("====================================================\n")
@@ -73,6 +76,7 @@ class Genius(Game):
                     voice_rate += 10
                     stage += 1
             
+            # Case the player loses
             os.system('cls')
             print("====================================================\n")
             print("You are wrong! The correct order was: ", self.drawn_items)
@@ -83,30 +87,18 @@ class Genius(Game):
                 sleep(1)
             print()
 
+            player.set_stage(stage)
 
-            ranking.set_ranking(ranking_df, self.player)
-
+            # Ranking Part (Load, change and update)
+            ranking_df = ranking.load_ranking("Sheet1")
+            new_ranking_df = ranking.set_ranking(ranking_df, player)
+            ranking.update_ranking(new_ranking_df, "Sheet1", "Sheet2")
 
         else:
             print("Ok, we can try again later!\n\n")
 
-
-    def get_name(self):
-        nickname = input("Insert your Nickname: ").title()
-        return nickname
-    
-
-    def get_edv(self):
-        while(True):
-            try:
-                cpf = int(input("Insert your EDV: "))
-                break
-            except:
-                print("You must enter only numbers")
-
-        return cpf
-
-
+    # Some support methods
+            
     def draw_item(self):
         return random.choice(Genius.items)
 
